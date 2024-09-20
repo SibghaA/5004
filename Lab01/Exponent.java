@@ -1,7 +1,7 @@
 public class Exponent {
     public static void main(String[] args) {
 
-        double base = 10.0;
+        double base = 10.11;
         int exponent = 2;
         double result1 = Math.pow(base, exponent);
 
