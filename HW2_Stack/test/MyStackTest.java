@@ -1,190 +1,177 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.EmptyStackException;
 
 /**
  * Test class for MyStack implementation.
- * Contains comprehensive tests for all stack operations including edge cases
- * and different data types. Each method is tested with at least three different
- * test cases to ensure proper functionality.
+ * Contains comprehensive tests with three assertions for each method.
  */
 public class MyStackTest {
 
-    /**
-     * Tests pushing a single String element onto the stack.
-     * Verifies correct string representation after push.
-     */
-    @Test
-    void testPushString(){
-        MyStack<String> myStack = new MyStack<>();
-        myStack.push("Hello");
-        assertEquals("Stack: Hello", myStack.toString());
+    private MyStack<String> stringStack;
+    private MyStack<Integer> intStack;
+    private MyStack<Double> doubleStack;
+    private MyStack<Character> charStack;
+    private MyStack<Book> bookStack;
+
+    @BeforeEach
+    void setUp() {
+        stringStack = new MyStack<>();
+        intStack = new MyStack<>();
+        doubleStack = new MyStack<>();
+        charStack = new MyStack<>();
+        bookStack = new MyStack<>();
     }
 
     /**
-     * Tests pushing multiple String elements onto the stack.
-     * Verifies correct order and representation of multiple elements.
+     * Tests push operation with String data type.
      */
     @Test
-    void testPushMultipleStrings(){
-        MyStack<String> myStack = new MyStack<>();
-        myStack.push("First");
-        myStack.push("Second");
-        assertEquals("Stack: First Second", myStack.toString());
+    void testPushString() {
+        stringStack.push("Hello");
+        assertEquals("Stack: Hello", stringStack.toString());
+        assertFalse(stringStack.isEmpty());
+        stringStack.push("World");
+        assertEquals("Stack: Hello World", stringStack.toString());
     }
 
     /**
-     * Tests pushing a Double element onto the stack.
-     * Verifies stack is not empty after push operation.
+     * Tests push operation with Double data type.
      */
     @Test
-    void testPushDouble(){
-        MyStack<Double> myStack = new MyStack<>();
-        myStack.push(3.14);
-        assertFalse(myStack.isEmpty());
+    void testPushDouble() {
+        doubleStack.push(3.14);
+        doubleStack.push(2.718);
+        assertEquals("Stack: 3.14 2.718", doubleStack.toString());
+        assertFalse(doubleStack.isEmpty());
+        assertEquals(2, doubleStack.toString().split(" ").length - 1); // -1 for "Stack:"
     }
 
     /**
-     * Tests that pop returns the last element added to the stack.
-     * Verifies LIFO (Last In First Out) behavior.
+     * Tests push operation with Book objects.
      */
     @Test
-    void testPopReturnLastElement(){
-        MyStack<Integer> myStack = new MyStack<>();
-        myStack.push(1);
-        myStack.push(2);
-        assertEquals(2, myStack.pop());
-    }
-
-    /**
-     * Tests that pop removes the element from the stack.
-     * Verifies correct string representation after pop.
-     */
-    @Test
-    void testPopRemovesElement(){
-        MyStack<String> myStack = new MyStack<>();
-        myStack.push("First");
-        myStack.push("Second");
-        myStack.pop();
-        assertEquals("Stack: First", myStack.toString());
-    }
-
-    /**
-     * Tests that pop throws EmptyStackException when stack is empty.
-     * Verifies proper exception handling.
-     */
-    @Test
-    void testPopEmptyStack() {
-        MyStack<Character> stack = new MyStack<>();
-        assertThrows(EmptyStackException.class, stack::pop);
-    }
-
-    /**
-     * Tests that top returns the last element without removing it.
-     * Verifies correct element is returned.
-     */
-    @Test
-    void testTopReturnsLastElement() {
-        MyStack<Integer> stack = new MyStack<>();
-        stack.push(1);
-        stack.push(2);
-        assertEquals(2, stack.top());
-    }
-
-    /**
-     * Tests that top does not remove the element from stack.
-     * Verifies stack remains non-empty after top operation.
-     */
-    @Test
-    void testTopDoesNotRemoveElement() {
-        MyStack<String> stack = new MyStack<>();
-        stack.push("Testing");
-        stack.top();
-        assertFalse(stack.isEmpty());
-    }
-
-    /**
-     * Tests that top throws EmptyStackException when stack is empty.
-     * Verifies proper exception handling.
-     */
-    @Test
-    void testTopEmptyStack() {
-        MyStack<Double> stack = new MyStack<>();
-        assertThrows(EmptyStackException.class, stack::top);
-    }
-
-    /**
-     * Tests that a newly created stack is empty.
-     * Verifies initial state of stack.
-     */
-    @Test
-    void testEmptyNewStack() {
-        MyStack<String> stack = new MyStack<>();
-        assertTrue(stack.isEmpty());
-    }
-
-    /**
-     * Tests that stack is not empty after push operation.
-     * Verifies empty state changes correctly after push.
-     */
-    @Test
-    void testEmptyAfterPush() {
-        MyStack<Integer> stack = new MyStack<>();
-        stack.push(1);
-        assertFalse(stack.isEmpty());
-    }
-
-    /**
-     * Tests that stack becomes empty after pushing and popping an element.
-     * Verifies empty state changes correctly after pop.
-     */
-    @Test
-    void testEmptyAfterPushAndPop() {
-        MyStack<Character> stack = new MyStack<>();
-        stack.push('X');
-        stack.pop();
-        assertTrue(stack.isEmpty());
-    }
-
-    /**
-     * Sample Book class for testing stack with custom objects.
-     * Demonstrates stack's ability to handle user-defined types.
-     */
-    static class Book {
-        private String title;
-
-        /**
-         * Constructs a Book with the given title.
-         *
-         * @param title the title of the book
-         */
-        public Book(String title) {
-            this.title = title;
-        }
-
-        /**
-         * Returns string representation of Book object.
-         *
-         * @return the title of the book
-         */
-        @Override
-        public String toString() {
-            return title;
-        }
-    }
-
-    /**
-     * Tests stack operations with custom Book class.
-     * Verifies stack can handle custom objects correctly.
-     */
-    @Test
-    void testCustomClassBook() {
-        MyStack<Book> stack = new MyStack<>();
+    void testPushBook() {
         Book book1 = new Book("Harry Potter 1");
+        bookStack.push(book1);
+        assertEquals("Stack: Harry Potter 1", bookStack.toString());
+        assertFalse(bookStack.isEmpty());
         Book book2 = new Book("Harry Potter 2");
-        stack.push(book1);
-        stack.push(book2);
-        assertEquals(book2, stack.pop());
-        assertEquals(book1, stack.top());
+        bookStack.push(book2);
+        assertTrue(bookStack.toString().contains("Harry Potter 2"));
+    }
+
+    /**
+     * Tests pop operation with Integer data type.
+     */
+    @Test
+    void testPopInteger() {
+        intStack.push(1);
+        intStack.push(2);
+        intStack.push(3);
+        assertEquals(3, intStack.pop());
+        assertEquals("Stack: 1 2", intStack.toString());
+        assertEquals(2, intStack.pop());
+    }
+
+    /**
+     * Tests pop operation with String data type.
+     */
+    @Test
+    void testPopString() {
+        stringStack.push("First");
+        stringStack.push("Second");
+        assertEquals("Second", stringStack.pop());
+        assertEquals("Stack: First", stringStack.toString());
+        assertEquals("First", stringStack.pop());
+    }
+
+    /**
+     * Tests pop operation with empty stack.
+     */
+    @Test
+    void testPopEmpty() {
+        assertThrows(EmptyStackException.class, () -> charStack.pop());
+        charStack.push('A');
+        charStack.pop();
+        assertThrows(EmptyStackException.class, () -> charStack.pop());
+        assertTrue(charStack.isEmpty());
+    }
+
+    /**
+     * Tests top operation with Double data type.
+     */
+    @Test
+    void testTopDouble() {
+        doubleStack.push(1.1);
+        doubleStack.push(2.2);
+        assertEquals(2.2, doubleStack.top());
+        assertEquals("Stack: 1.1 2.2", doubleStack.toString());
+        assertEquals(2.2, doubleStack.top()); // Verify top doesn't change stack
+    }
+
+    /**
+     * Tests top operation with Book objects.
+     */
+    @Test
+    void testTopBook() {
+        Book book1 = new Book("Book1");
+        Book book2 = new Book("Book2");
+        bookStack.push(book1);
+        bookStack.push(book2);
+        assertEquals(book2, bookStack.top());
+        assertEquals("Stack: Book1 Book2", bookStack.toString());
+        assertEquals(book2, bookStack.top()); // Verify top is consistent
+    }
+
+    /**
+     * Tests top operation with empty stack.
+     */
+    @Test
+    void testTopEmpty() {
+        assertThrows(EmptyStackException.class, () -> stringStack.top());
+        stringStack.push("Test");
+        assertEquals("Test", stringStack.top());
+        stringStack.pop();
+        assertThrows(EmptyStackException.class, () -> stringStack.top());
+    }
+
+    /**
+     * Tests empty operation with different data types.
+     */
+    @Test
+    void testEmpty() {
+        assertTrue(stringStack.isEmpty());  // Test initial state
+        stringStack.push("Test");
+        assertFalse(stringStack.isEmpty()); // Test after push
+        stringStack.pop();
+        assertTrue(stringStack.isEmpty());  // Test after pop
+    }
+
+    /**
+     * Tests empty operation with multiple operations.
+     */
+    @Test
+    void testEmptyWithMultipleOperations() {
+        assertTrue(doubleStack.isEmpty());
+        doubleStack.push(1.0);
+        doubleStack.push(2.0);
+        assertFalse(doubleStack.isEmpty());
+        doubleStack.pop();
+        doubleStack.pop();
+        assertTrue(doubleStack.isEmpty());
+    }
+
+    /**
+     * Tests empty operation with Book objects.
+     */
+    @Test
+    void testEmptyWithBooks() {
+        assertTrue(bookStack.isEmpty());
+        bookStack.push(new Book("Test Book"));
+        assertFalse(bookStack.isEmpty());
+        bookStack.pop();
+        assertTrue(bookStack.isEmpty());
     }
 }
