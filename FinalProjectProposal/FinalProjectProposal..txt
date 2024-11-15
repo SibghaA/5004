@@ -101,7 +101,7 @@ j)As mentioned, multiple things can go wrong with location services. We need to 
  9. VERY INFORMAL ARCHITECTURE AND DESIGN DIAGRAMS (MVC or similar; Class Diagram(s), 15 points)
     This can be very informal, phone picture of sheet of paper, hand-drawn on tablet, or similar.
 
-/******************** LastBite Standing - MVC Architecture ********************\
+/****************** LastBite Standing - MVC Architecture ******************\
 
 +----------------+        (1)         +------------------+       (2)        +---------------+
 |     MODEL      | <----------------- |    CONTROLLER    | <--------------- |     VIEW      |
