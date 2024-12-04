@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="63b52987-53f9-425c-978e-6e7bcaeab611" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HW4.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tictactoe/view/TicTacToeView.java" afterDir="false" />
-    </list>
+    <list default="true" id="63b52987-53f9-425c-978e-6e7bcaeab611" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,7 +64,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733281522734</updated>
-      <workItem from="1733281523882" duration="645000" />
+      <workItem from="1733281523882" duration="1541000" />
     </task>
     <servers />
   </component>
