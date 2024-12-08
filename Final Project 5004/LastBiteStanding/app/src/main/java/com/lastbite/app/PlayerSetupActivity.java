@@ -17,10 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PlayerSetupActivity extends AppCompatActivity {
-    EditText numPlayersInput;
-    Button confirmPlayersBtn;
-    LinearLayout playerInputsContainer;
-    Button startGameBtn;
+    private EditText numPlayersInput;
+    private Button confirmPlayersBtn;
+    private LinearLayout playerInputsContainer;
+    private Button startGameBtn;
     private List<String> playerPreferences;
     private double latitude;
     private double longitude;
