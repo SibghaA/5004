@@ -1,0 +1,10 @@
+// Project-level build.gradle
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath libs.gradle.v810
+    }
+}
