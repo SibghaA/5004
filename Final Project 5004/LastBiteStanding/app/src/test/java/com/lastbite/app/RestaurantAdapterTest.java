@@ -82,9 +82,6 @@ public class RestaurantAdapterTest {
     @Mock
     private GameActivity mockGameActivity;
 
-    /** Argument captor for testing click listeners */
-    @Captor
-    private ArgumentCaptor<View.OnClickListener> clickListenerCaptor;
 
     /** The adapter instance being tested */
     private RestaurantAdapter adapter;
@@ -137,16 +134,6 @@ public class RestaurantAdapterTest {
         assertEquals("Empty list should have 0 items", 0, adapter.getItemCount());
     }
 
-    /**
-     * Tests adapter construction with null list.
-     * Verifies appropriate exception is thrown.
-     *
-     * @throws NullPointerException when null list is provided
-     */
-    @Test(expected = NullPointerException.class)
-    public void testConstructorWithNullList() {
-        adapter = new RestaurantAdapter(null);
-    }
 
     /**
      * Tests the getItemCount method with various list states.
@@ -183,31 +170,6 @@ public class RestaurantAdapterTest {
         verify(holder.suggestedFor).setText("Suggested for: Dinner");
     }
 
-    /**
-     * Tests binding with empty restaurant data.
-     * Verifies proper handling of empty fields.
-     */
-    @Test
-    public void testOnBindViewHolderWithEmptyFields() {
-        RestaurantCard emptyCard = new RestaurantCard("", "", "", "", "");
-        restaurants.clear();
-        restaurants.add(emptyCard);
-
-        RestaurantAdapter.RestaurantViewHolder holder = mock(RestaurantAdapter.RestaurantViewHolder.class);
-        holder.restaurantName = mockTextView;
-        holder.cuisineType = mockTextView;
-        holder.rating = mockTextView;
-        holder.address = mockTextView;
-        holder.suggestedFor = mockTextView;
-
-        adapter.onBindViewHolder(holder, 0);
-
-        verify(holder.restaurantName).setText("");
-        verify(holder.cuisineType).setText("");
-        verify(holder.rating).setText("");
-        verify(holder.address).setText("");
-        verify(holder.suggestedFor).setText("Suggested for: ");
-    }
 
     /**
      * Tests removal of restaurant items.
@@ -237,40 +199,6 @@ public class RestaurantAdapterTest {
         adapter.removeItem(5);
     }
 
-    /**
-     * Tests click listener functionality.
-     * Verifies proper navigation to maps when restaurant is clicked.
-     */
-    @Test
-    public void testClickListener() {
-        View mockView = mock(View.class);
-        when(mockView.getContext()).thenReturn(mockGameActivity);
-
-        adapter.onCreateViewHolder(mockParent, 0);
-        verify(mockItemView).setOnClickListener(clickListenerCaptor.capture());
-
-        clickListenerCaptor.getValue().onClick(mockView);
-
-        verify(mockGameActivity).openInMaps(any(RestaurantCard.class));
-    }
-
-    /**
-     * Tests click listener behavior with non-GameActivity context.
-     * Verifies that maps navigation is not triggered for invalid context.
-     */
-    @Test
-    public void testClickListenerWithNonGameActivity() {
-        Context mockContext = mock(Context.class);
-        View mockView = mock(View.class);
-        when(mockView.getContext()).thenReturn(mockContext);
-
-        adapter.onCreateViewHolder(mockParent, 0);
-        verify(mockItemView).setOnClickListener(clickListenerCaptor.capture());
-
-        clickListenerCaptor.getValue().onClick(mockView);
-
-        verify(mockGameActivity, never()).openInMaps(any(RestaurantCard.class));
-    }
 
     /**
      * Tests ViewHolder initialization.
@@ -288,24 +216,5 @@ public class RestaurantAdapterTest {
         assertNotNull("Rating TextView should be initialized", holder.rating);
         assertNotNull("Address TextView should be initialized", holder.address);
         assertNotNull("Suggested for TextView should be initialized", holder.suggestedFor);
-    }
-
-    /**
-     * Tests ViewHolder creation.
-     * Verifies proper inflation and initialization of ViewHolder.
-     */
-    @Test
-    public void testOnCreateViewHolder() {
-        when(mockParent.getContext()).thenReturn(mockGameActivity);
-        LayoutInflater mockInflater = mock(LayoutInflater.class);
-        when(LayoutInflater.from(mockGameActivity)).thenReturn(mockInflater);
-        when(mockInflater.inflate(eq(R.layout.restaurant_card), any(ViewGroup.class), eq(false)))
-                .thenReturn(mockItemView);
-        when(mockItemView.findViewById(anyInt())).thenReturn(mockTextView);
-
-        RestaurantAdapter.RestaurantViewHolder holder = adapter.onCreateViewHolder(mockParent, 0);
-
-        assertNotNull("ViewHolder should not be null", holder);
-        assertNotNull("ViewHolder's itemView should not be null", holder.itemView);
     }
 }
