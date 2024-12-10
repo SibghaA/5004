@@ -30,6 +30,20 @@ import android.widget.LinearLayout;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 
+/**
+ * A core gameplay activity that manages the restaurant selection and veto process for the LastBite app.
+ * This activity implements a turn-based voting system where players can veto restaurant choices until
+ * a final selection is made, combining user preferences with location-based restaurant recommendations
+ * from the Google Places API.
+ *
+ * The activity manages multiple aspects of the game:
+ * - Player turn management
+ * - Restaurant fetching based on player preferences
+ * - Veto system implementation
+ * - Final restaurant selection
+ * - Google Maps integration
+ */
+
 public class GameActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RestaurantAdapter adapter;
@@ -42,6 +56,15 @@ public class GameActivity extends AppCompatActivity {
     private double latitude;
     private double longitude;
 
+
+    /**
+     * Initializes the game activity and sets up the necessary components for gameplay.
+     * This method handles the initialization of Google Places API, retrieves player preferences
+     * and location data from the intent, and sets up the UI components including the RecyclerView
+     * for restaurant cards.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,11 +88,20 @@ public class GameActivity extends AppCompatActivity {
         updateCurrentPlayerText();
     }
 
+    /**
+     * Initializes and sets up all view components used in the activity.
+     * This includes the current player text display and the RecyclerView for restaurants.
+     */
     private void initializeViews() {
         currentPlayerText = findViewById(R.id.currentPlayerText);
         recyclerView = findViewById(R.id.restaurantsRecyclerView);
     }
 
+    /**
+     * Configures the RecyclerView with appropriate layout manager, adapter, and swipe functionality.
+     * Sets up the ItemTouchHelper for handling left swipe gestures that represent veto actions.
+     * The swipe callback includes visual feedback and handles the veto logic for removing restaurants.
+     */
     private void setupRecyclerView() {
         restaurants = new ArrayList<>();
         adapter = new RestaurantAdapter(restaurants);
@@ -116,6 +148,11 @@ public class GameActivity extends AppCompatActivity {
         new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);
     }
 
+    /**
+     * Configures the RecyclerView with appropriate layout manager, adapter, and swipe functionality.
+     * Sets up the ItemTouchHelper for handling left swipe gestures that represent veto actions.
+     * The swipe callback includes visual feedback and handles the veto logic for removing restaurants.
+     */
     private void updateCurrentPlayerText() {
         if (vetosRemaining > 0) {
             PlayerPreference currentPlayer = players.get(currentPlayerIndex);
@@ -123,6 +160,14 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays the final selected restaurant and creates a replay button.
+     * This method is called when all vetos have been used and only one restaurant remains.
+     * It updates the UI to show the final selection and provides options to:
+     * - View the result
+     * - Open the restaurant in Google Maps
+     * - Start a new game
+     */
     private void showFinalResult() {
         if (restaurants.size() == 1) {
             RestaurantCard finalChoice = restaurants.get(0);
@@ -152,11 +197,21 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // Callback interface for restaurant fetching
+
+    /**
+     * Interface for handling asynchronous restaurant fetching operations.
+     * Provides a callback method to be executed when a restaurant has been successfully fetched.
+     */
     private interface RestaurantFetchCallback {
         void onRestaurantFetched();
     }
 
+    /**
+     * Initiates the process of fetching restaurants based on player preferences.
+     * Creates a geographical bound for the search area and fetches restaurants for each player's
+     * preferred cuisine. Once all player-preferred restaurants are fetched, it proceeds to fetch
+     * an additional high-rated restaurant as a bonus option.
+     */
     private void fetchRestaurants() {
         // Create bounds for nearby search
         double radiusInDegrees = 0.02; // Roughly 2km
@@ -171,6 +226,10 @@ public class GameActivity extends AppCompatActivity {
         // First, fetch restaurants for player preferences
         for (PlayerPreference player : players) {
             findRestaurantForCuisine(player.cuisine, player.name, searchBounds, new RestaurantFetchCallback() {
+                /**
+                 * Called when a restaurant has been successfully fetched from the Places API.
+                 */
+
                 @Override
                 public void onRestaurantFetched() {
                     int fetched = restaurantsFetched.incrementAndGet();
@@ -182,6 +241,15 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Searches for and fetches a restaurant matching the specified cuisine within the given bounds.
+     * Uses the Google Places API to find restaurants and adds them to the list when found.
+     *
+     * @param cuisine The type of cuisine to search for
+     * @param playerName The name of the player who preferred this cuisine
+     * @param bounds The geographical bounds to search within
+     * @param callback Callback to execute after the restaurant is fetched
+     */
     private void findRestaurantForCuisine(String cuisine, String playerName,
                                           RectangularBounds bounds,
                                           RestaurantFetchCallback callback) {
@@ -235,6 +303,13 @@ public class GameActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Finds a random highly-rated restaurant of a cuisine different from player preferences.
+     * Filters out cuisines already chosen by players and selects a random available cuisine
+     * for the search.
+     *
+     * @param bounds The geographical bounds to search within
+     */
     private void findRandomHighRatedRestaurant(RectangularBounds bounds) {
         String[] randomCuisines = {"Italian", "Mexican", "Chinese", "Thai", "Indian", "Japanese",
                 "Mediterranean", "French", "Korean", "Vietnamese", "Middle Eastern"};
@@ -256,6 +331,13 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Searches for a highly-rated restaurant matching the specified query within given bounds.
+     * Uses the Google Places API to find restaurants with ratings of 4.0 or higher.
+     *
+     * @param bounds The geographical bounds to search within
+     * @param query The search query string for finding restaurants
+     */
     private void findHighRatedRestaurant(RectangularBounds bounds, String query) {
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 .setLocationBias(bounds)
@@ -307,6 +389,14 @@ public class GameActivity extends AppCompatActivity {
                     Log.e("Places", "Place prediction failed: " + exception.getMessage());
                 });
     }
+
+    /**
+     * Opens the selected restaurant in Google Maps application for navigation and additional details.
+     * Creates an intent to launch Google Maps with the restaurant's name and address as search parameters,
+     * falling back to a toast message if Google Maps is not installed on the device.
+     *
+     * @param restaurant The RestaurantCard object containing the selected restaurant's details
+     */
     public void openInMaps(RestaurantCard restaurant) {
         String query = restaurant.getName() + " " + restaurant.getAddress();
         Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(query));
@@ -320,6 +410,13 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Restarts the game by clearing the activity stack and returning to the MainActivity.
+     * This method is called when players want to start a new game after completing the current session,
+     * ensuring a clean state for the new game. It clears the activity stack to prevent multiple
+     * game instances from running simultaneously.
+     */
     private void restartGame() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
