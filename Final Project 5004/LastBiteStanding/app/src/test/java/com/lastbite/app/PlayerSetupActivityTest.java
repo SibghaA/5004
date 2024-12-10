@@ -1,3 +1,18 @@
+/**
+ * Unit test suite for the PlayerSetupActivity class.
+ * Tests the player setup flow including input validation, UI state management,
+ * and navigation to the game activity. Uses Robolectric for Android framework simulation.
+ *
+ * <p>The test suite covers:</p>
+ * <ul>
+ *   <li>Initial activity state and view initialization</li>
+ *   <li>Location data handling from intent</li>
+ *   <li>Player input creation and validation</li>
+ *   <li>Navigation to game activity</li>
+ *   <li>Error handling and user feedback</li>
+ *   <li>Cuisine selection options</li>
+ * </ul>
+ */
 package com.lastbite.app;
 
 import android.content.Intent;
@@ -26,35 +41,53 @@ import static org.robolectric.shadows.ShadowView.clickOn;
 @RunWith(RobolectricTestRunner.class)
 public class PlayerSetupActivityTest {
 
+    /** The activity under test */
     private PlayerSetupActivity activity;
+
+    /** Input field for number of players */
     private EditText numPlayersInput;
+
+    /** Button to confirm number of players */
     private Button confirmPlayersBtn;
+
+    /** Container for dynamically created player input fields */
     private LinearLayout playerInputsContainer;
+
+    /** Button to start the game */
     private Button startGameBtn;
+
+    /** Test latitude value for location testing */
     private static final double TEST_LATITUDE = 37.7749;
+
+    /** Test longitude value for location testing */
     private static final double TEST_LONGITUDE = -122.4194;
 
+    /**
+     * Sets up the test environment before each test.
+     * Creates the activity with test coordinates and initializes all view references.
+     */
     @Before
     public void setUp() {
-        // Create intent with test coordinates
         Intent intent = new Intent(RuntimeEnvironment.application, PlayerSetupActivity.class);
         intent.putExtra("latitude", TEST_LATITUDE);
         intent.putExtra("longitude", TEST_LONGITUDE);
 
-        // Create and start activity
         activity = Robolectric.buildActivity(PlayerSetupActivity.class, intent)
                 .create()
                 .start()
                 .resume()
                 .get();
 
-        // Initialize views
         numPlayersInput = activity.findViewById(R.id.numPlayersInput);
         confirmPlayersBtn = activity.findViewById(R.id.confirmPlayersBtn);
         playerInputsContainer = activity.findViewById(R.id.playerInputsContainer);
         startGameBtn = activity.findViewById(R.id.startGameBtn);
     }
 
+    /**
+     * Tests the initial state of the activity.
+     * Verifies that all views are properly initialized and in their default states.
+     */
     @Test
     public void testInitialState() {
         assertNotNull("Activity should not be null", activity);
@@ -69,6 +102,9 @@ public class PlayerSetupActivityTest {
                 View.GONE, startGameBtn.getVisibility());
     }
 
+    /**
+     * Tests that location coordinates are correctly extracted from the intent.
+     */
     @Test
     public void testLocationExtraction() {
         assertEquals("Latitude should match intent value",
@@ -77,6 +113,10 @@ public class PlayerSetupActivityTest {
                 TEST_LONGITUDE, activity.getIntent().getDoubleExtra("longitude", 0), 0.0001);
     }
 
+    /**
+     * Tests player input creation with a valid number of players.
+     * Verifies that correct number of input fields are created with proper initialization.
+     */
     @Test
     public void testCreatePlayerInputsWithValidNumber() {
         numPlayersInput.setText("3");
@@ -87,7 +127,6 @@ public class PlayerSetupActivityTest {
         assertEquals("Start game button should be visible",
                 View.VISIBLE, startGameBtn.getVisibility());
 
-        // Verify each player input view
         for (int i = 0; i < 3; i++) {
             View playerView = playerInputsContainer.getChildAt(i);
             EditText nameInput = playerView.findViewById(R.id.playerNameInput);
@@ -100,6 +139,10 @@ public class PlayerSetupActivityTest {
         }
     }
 
+    /**
+     * Tests error handling when no number of players is entered.
+     * Verifies appropriate error message and no input fields created.
+     */
     @Test
     public void testCreatePlayerInputsWithEmptyInput() {
         numPlayersInput.setText("");
@@ -111,6 +154,10 @@ public class PlayerSetupActivityTest {
                 0, playerInputsContainer.getChildCount());
     }
 
+    /**
+     * Tests validation of minimum player count.
+     * Verifies error handling when too few players are specified.
+     */
     @Test
     public void testCreatePlayerInputsWithTooFewPlayers() {
         numPlayersInput.setText("1");
@@ -122,6 +169,10 @@ public class PlayerSetupActivityTest {
                 0, playerInputsContainer.getChildCount());
     }
 
+    /**
+     * Tests validation of maximum player count.
+     * Verifies error handling when too many players are specified.
+     */
     @Test
     public void testCreatePlayerInputsWithTooManyPlayers() {
         numPlayersInput.setText("11");
@@ -133,13 +184,15 @@ public class PlayerSetupActivityTest {
                 0, playerInputsContainer.getChildCount());
     }
 
+    /**
+     * Tests successful game start with valid player inputs.
+     * Verifies proper intent creation and data passing to next activity.
+     */
     @Test
     public void testValidateAndProceedWithValidInput() {
-        // Set up player inputs
         numPlayersInput.setText("2");
         confirmPlayersBtn.performClick();
 
-        // Fill in player information
         for (int i = 0; i < 2; i++) {
             View playerView = playerInputsContainer.getChildAt(i);
             EditText nameInput = playerView.findViewById(R.id.playerNameInput);
@@ -148,14 +201,12 @@ public class PlayerSetupActivityTest {
 
         startGameBtn.performClick();
 
-        // Verify intent
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Intent nextActivity = shadowActivity.getNextStartedActivity();
         assertNotNull("Should start next activity", nextActivity);
         assertEquals("Should start GameActivity",
                 GameActivity.class.getName(), nextActivity.getComponent().getClassName());
 
-        // Verify extras
         assertEquals("Latitude should be passed to next activity",
                 TEST_LATITUDE, nextActivity.getDoubleExtra("latitude", 0), 0.0001);
         assertEquals("Longitude should be passed to next activity",
@@ -166,6 +217,10 @@ public class PlayerSetupActivityTest {
         assertEquals("Should have correct number of players", 2, players.size());
     }
 
+    /**
+     * Tests error handling when player names are not provided.
+     * Verifies appropriate error message and prevented navigation.
+     */
     @Test
     public void testValidateAndProceedWithEmptyNames() {
         numPlayersInput.setText("2");
@@ -180,13 +235,15 @@ public class PlayerSetupActivityTest {
         assertNull("Should not start next activity", shadowActivity.getNextStartedActivity());
     }
 
+    /**
+     * Tests cuisine spinner initialization and content.
+     * Verifies that cuisine options are properly populated.
+     */
     @Test
     public void testCuisineSpinnerContents() {
-        // Use valid number of players (2 instead of 1)
         numPlayersInput.setText("2");
         confirmPlayersBtn.performClick();
 
-        // Verify container has children before accessing
         assertTrue("Player inputs container should have children",
                 playerInputsContainer.getChildCount() > 0);
 
@@ -197,7 +254,6 @@ public class PlayerSetupActivityTest {
         assertNotNull("Cuisine spinner should not be null", cuisineSpinner);
         assertTrue("Cuisine spinner should have items", cuisineSpinner.getCount() > 0);
 
-        // Verify specific cuisine types
         boolean hasAmerican = false;
         boolean hasItalian = false;
         for (int i = 0; i < cuisineSpinner.getCount(); i++) {
@@ -209,15 +265,17 @@ public class PlayerSetupActivityTest {
         assertTrue("Should contain Italian cuisine", hasItalian);
     }
 
+    /**
+     * Tests that player input fields are properly cleared when number of players changes.
+     * Verifies container is reset with new number of inputs.
+     */
     @Test
     public void testPlayerInputsClearOnNewNumberInput() {
-        // First create some players
         numPlayersInput.setText("3");
         confirmPlayersBtn.performClick();
 
         int initialCount = playerInputsContainer.getChildCount();
 
-        // Create new number of players
         numPlayersInput.setText("2");
         confirmPlayersBtn.performClick();
 
@@ -227,12 +285,15 @@ public class PlayerSetupActivityTest {
                 2, playerInputsContainer.getChildCount());
     }
 
+    /**
+     * Tests validation when only some player names are filled.
+     * Verifies appropriate error handling and prevented navigation.
+     */
     @Test
     public void testStartGameWithPartiallyFilledNames() {
         numPlayersInput.setText("2");
         confirmPlayersBtn.performClick();
 
-        // Fill only first player's name
         View playerView = playerInputsContainer.getChildAt(0);
         EditText nameInput = playerView.findViewById(R.id.playerNameInput);
         nameInput.setText("Player 1");

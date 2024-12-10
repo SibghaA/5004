@@ -1,3 +1,16 @@
+/**
+ * Unit test suite for the PlayerPreference class.
+ * Tests both basic functionality and Parcelable implementation of the PlayerPreference class.
+ * Uses Robolectric test runner to simulate Android framework components.
+ *
+ * <p>The test suite covers:</p>
+ * <ul>
+ *   <li>Basic constructor functionality with various input types</li>
+ *   <li>Parcelable implementation for data persistence</li>
+ *   <li>Edge cases including null values and special characters</li>
+ *   <li>Creator functionality for array creation</li>
+ * </ul>
+ */
 package com.lastbite.app;
 
 import android.os.Parcel;
@@ -10,6 +23,10 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class PlayerPreferenceTest {
 
+    /**
+     * Tests the constructor with valid string inputs.
+     * Verifies that name and cuisine are correctly stored.
+     */
     @Test
     public void testConstructorWithValidInput() {
         String name = "John";
@@ -20,6 +37,10 @@ public class PlayerPreferenceTest {
         assertEquals("Cuisine should match constructor input", cuisine, preference.cuisine);
     }
 
+    /**
+     * Tests the constructor with empty strings.
+     * Verifies that empty strings are handled correctly.
+     */
     @Test
     public void testConstructorWithEmptyStrings() {
         PlayerPreference preference = new PlayerPreference("", "");
@@ -28,6 +49,10 @@ public class PlayerPreferenceTest {
         assertEquals("Cuisine should be empty string", "", preference.cuisine);
     }
 
+    /**
+     * Tests the constructor with null values.
+     * Verifies that null values are handled correctly.
+     */
     @Test
     public void testConstructorWithNullValues() {
         PlayerPreference preference = new PlayerPreference(null, null);
@@ -36,6 +61,10 @@ public class PlayerPreferenceTest {
         assertNull("Cuisine should be null", preference.cuisine);
     }
 
+    /**
+     * Tests the constructor with strings containing special characters.
+     * Verifies that special characters are preserved.
+     */
     @Test
     public void testConstructorWithSpecialCharacters() {
         String specialName = "John!@#$%^&*()";
@@ -46,20 +75,20 @@ public class PlayerPreferenceTest {
         assertEquals("Cuisine should handle special characters", specialCuisine, preference.cuisine);
     }
 
+    /**
+     * Tests the Parcelable implementation with valid string inputs.
+     * Verifies that object can be correctly written to and read from a Parcel.
+     */
     @Test
     public void testParcelableWriteAndRead() {
         String name = "John";
         String cuisine = "Italian";
         PlayerPreference originalPreference = new PlayerPreference(name, cuisine);
 
-        // Write to parcel
         Parcel parcel = Parcel.obtain();
         originalPreference.writeToParcel(parcel, 0);
-
-        // Reset parcel for reading
         parcel.setDataPosition(0);
 
-        // Read from parcel
         PlayerPreference createdFromParcel = PlayerPreference.CREATOR.createFromParcel(parcel);
 
         assertEquals("Name should survive parceling", name, createdFromParcel.name);
@@ -68,6 +97,10 @@ public class PlayerPreferenceTest {
         parcel.recycle();
     }
 
+    /**
+     * Tests the Parcelable implementation with empty strings.
+     * Verifies that empty strings are preserved through the parceling process.
+     */
     @Test
     public void testParcelableWithEmptyStrings() {
         PlayerPreference originalPreference = new PlayerPreference("", "");
@@ -84,6 +117,10 @@ public class PlayerPreferenceTest {
         parcel.recycle();
     }
 
+    /**
+     * Tests the Parcelable implementation with null values.
+     * Verifies that null values are preserved through the parceling process.
+     */
     @Test
     public void testParcelableWithNullValues() {
         PlayerPreference originalPreference = new PlayerPreference(null, null);
@@ -100,6 +137,10 @@ public class PlayerPreferenceTest {
         parcel.recycle();
     }
 
+    /**
+     * Tests the Parcelable implementation with strings containing special characters.
+     * Verifies that special characters are preserved through the parceling process.
+     */
     @Test
     public void testParcelableWithSpecialCharacters() {
         String specialName = "John!@#$%^&*()";
@@ -120,6 +161,10 @@ public class PlayerPreferenceTest {
         parcel.recycle();
     }
 
+    /**
+     * Tests the Parcelable implementation with very long strings.
+     * Verifies that long strings are handled correctly in the parceling process.
+     */
     @Test
     public void testParcelableWithLongStrings() {
         String longName = "a".repeat(1000);
@@ -138,12 +183,20 @@ public class PlayerPreferenceTest {
         parcel.recycle();
     }
 
+    /**
+     * Tests the describeContents method.
+     * Verifies that it returns the expected value of 0.
+     */
     @Test
     public void testDescribeContents() {
         PlayerPreference preference = new PlayerPreference("John", "Italian");
         assertEquals("describeContents should return 0", 0, preference.describeContents());
     }
 
+    /**
+     * Tests the CREATOR.newArray method with a positive size.
+     * Verifies that the created array has the correct length and initial values.
+     */
     @Test
     public void testCreatorNewArray() {
         PlayerPreference[] array = PlayerPreference.CREATOR.newArray(5);
@@ -153,6 +206,10 @@ public class PlayerPreferenceTest {
         assertNull("Array elements should be null initially", array[0]);
     }
 
+    /**
+     * Tests the CREATOR.newArray method with zero size.
+     * Verifies that an empty array is created correctly.
+     */
     @Test
     public void testCreatorNewArrayWithZeroSize() {
         PlayerPreference[] array = PlayerPreference.CREATOR.newArray(0);
@@ -161,6 +218,12 @@ public class PlayerPreferenceTest {
         assertEquals("Created array should have zero length", 0, array.length);
     }
 
+    /**
+     * Tests the CREATOR.newArray method with negative size.
+     * Verifies that a NegativeArraySizeException is thrown.
+     *
+     * @throws NegativeArraySizeException when a negative size is provided
+     */
     @Test(expected = NegativeArraySizeException.class)
     public void testCreatorNewArrayWithNegativeSize() {
         PlayerPreference.CREATOR.newArray(-1);

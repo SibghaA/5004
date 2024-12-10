@@ -1,3 +1,16 @@
+/**
+ * A core gameplay activity that manages the restaurant selection and veto process for the LastBite app.
+ * This activity implements a turn-based voting system where players can veto restaurant choices until
+ * a final selection is made, combining user preferences with location-based restaurant recommendations
+ * from the Google Places API.
+ *
+ * The activity manages multiple aspects of the game:
+ * - Player turn management
+ * - Restaurant fetching based on player preferences
+ * - Veto system implementation
+ * - Final restaurant selection
+ * - Google Maps integration
+ */
 package com.lastbite.app;
 
 import android.os.Bundle;
@@ -30,19 +43,6 @@ import android.widget.LinearLayout;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 
-/**
- * A core gameplay activity that manages the restaurant selection and veto process for the LastBite app.
- * This activity implements a turn-based voting system where players can veto restaurant choices until
- * a final selection is made, combining user preferences with location-based restaurant recommendations
- * from the Google Places API.
- *
- * The activity manages multiple aspects of the game:
- * - Player turn management
- * - Restaurant fetching based on player preferences
- * - Veto system implementation
- * - Final restaurant selection
- * - Google Maps integration
- */
 
 public class GameActivity extends AppCompatActivity {
     private RecyclerView recyclerView;

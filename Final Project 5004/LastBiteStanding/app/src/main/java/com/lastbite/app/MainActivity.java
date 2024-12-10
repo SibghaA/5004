@@ -1,3 +1,16 @@
+/**
+ * The main entry point activity for the LastBite app that handles location selection and initialization.
+ * This activity provides users with options to select a location either through manual search using
+ * Google Places Autocomplete or by using their current location, and integrates with Google Maps
+ * for visual location confirmation before proceeding to player setup.
+ *
+ * The activity manages:
+ * - Location permissions
+ * - Google Maps integration
+ * - Places API autocomplete
+ * - Location services
+ * - Navigation to player setup
+ */
 package com.lastbite.app;
 
 import android.os.Bundle;
@@ -30,7 +43,12 @@ import android.view.View;
 import android.widget.EditText;
 import androidx.cardview.widget.CardView;
 
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+    /**
+     * Request code for location permission requests.
+     * Used to identify permission results in onRequestPermissionsResult callback.
+     */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
     private GoogleMap googleMap;
@@ -38,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationManager locationManager;
     private Button useCurrentLocationBtn;
 
+    /**
+     * Initializes the activity, sets up the UI components, and initializes required services.
+     * This includes initializing the Places SDK, location services, map view, and places autocomplete.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +80,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupPlacesAutocomplete();
     }
 
+    /**
+     * Initializes and sets up all view components including the map view and location button.
+     * Configures the MapView with saved instance state and sets up click listeners.
+     *
+     * @param savedInstanceState Bundle containing the previously saved state
+     */
     private void initializeViews(Bundle savedInstanceState) {
         useCurrentLocationBtn = findViewById(R.id.useCurrentLocationBtn);
         mapView = findViewById(R.id.mapView);
@@ -68,6 +98,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.getMapAsync(this);
     }
 
+    /**
+     * Sets up the Google Places Autocomplete fragment for location search functionality.
+     * Configures the autocomplete fragment with custom styling and place field specifications,
+     * and implements place selection handling.
+     */
     private void setupPlacesAutocomplete() {
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -119,6 +154,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Handles the process of retrieving the user's current location.
+     * Checks for location permissions and requests them if not granted.
+     * When permissions are available, retrieves the current location and updates the UI.
+     */
     private void handleGetCurrentLocation() {
         if (!checkLocationPermission()) {
             requestLocationPermission();
@@ -143,17 +183,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    /**
+     * Checks if the app has been granted location permissions.
+     *
+     * @return true if location permission is granted, false otherwise
+     */
     private boolean checkLocationPermission() {
         return ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Requests location permissions from the user.
+     * Triggers the system permission dialog for ACCESS_FINE_LOCATION.
+     */
     private void requestLocationPermission() {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 LOCATION_PERMISSION_REQUEST_CODE);
     }
 
+    /**
+     * Updates the map display with a new location.
+     * Clears existing markers, adds a new marker at the specified location,
+     * and animates the camera to center on the new location.
+     *
+     * @param latLng The latitude and longitude of the new location
+     */
     private void updateMapLocation(LatLng latLng) {
         if (googleMap != null) {
             googleMap.clear();
@@ -162,6 +218,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Navigates to the PlayerSetupActivity with the selected location.
+     * Passes the latitude and longitude as extras in the intent.
+     *
+     * @param location The selected LatLng location to pass to the next activity
+     */
     private void proceedToPlayerSetup(LatLng location) {
         Intent intent = new Intent(this, PlayerSetupActivity.class);
         intent.putExtra("latitude", location.latitude);
@@ -169,10 +231,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivity(intent);
     }
 
+    /**
+     * Displays an error message to the user using a Toast.
+     *
+     * @param message The error message to display
+     */
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Callback for when the Google Map is ready to be used.
+     * Configures initial map settings and displays a default location.
+     *
+     * @param map The Google Map instance that is ready to be used
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         googleMap = map;
@@ -185,6 +258,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         updateMapLocation(defaultLocation);
     }
 
+    /**
+     * Handles the result of a permission request.
+     * If location permission is granted, proceeds with getting the current location.
+     *
+     * @param requestCode The request code passed in requestPermissions()
+     * @param permissions The requested permissions
+     * @param grantResults The grant results for the corresponding permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -196,31 +277,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    // MapView lifecycle methods
+    /**
+     * Called when the activity resumes.
+     * Ensures proper MapView lifecycle management.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
+    /**
+     * Called when the activity is paused.
+     * Ensures proper MapView lifecycle management.
+     */
     @Override
     protected void onPause() {
         mapView.onPause();
         super.onPause();
     }
 
+    /**
+     * Called when the activity is destroyed.
+     * Ensures proper cleanup of the MapView.
+     */
     @Override
     protected void onDestroy() {
         mapView.onDestroy();
         super.onDestroy();
     }
 
+    /**
+     * Saves the instance state of the activity.
+     * Ensures proper state management for the MapView.
+     *
+     * @param outState Bundle in which to place your saved state
+     */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
 
+    /**
+     * Called when the system is running low on memory.
+     * Forwards the low memory notification to MapView.
+     */
     @Override
     public void onLowMemory() {
         super.onLowMemory();

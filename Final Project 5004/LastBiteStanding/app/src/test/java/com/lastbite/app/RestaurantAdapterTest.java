@@ -1,3 +1,18 @@
+/**
+ * Unit test suite for the RestaurantAdapter class.
+ * Tests the adapter's functionality for displaying restaurant cards in a RecyclerView.
+ * Uses Robolectric for Android framework simulation and Mockito for mocking dependencies.
+ *
+ * <p>The test suite covers:</p>
+ * <ul>
+ *   <li>Adapter initialization and construction</li>
+ *   <li>View creation and binding</li>
+ *   <li>Item management (counting, removal)</li>
+ *   <li>Click handling and navigation</li>
+ *   <li>ViewHolder initialization</li>
+ *   <li>Error cases and edge conditions</li>
+ * </ul>
+ */
 package com.lastbite.app;
 
 import android.content.Context;
@@ -29,31 +44,62 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit test suite for the RestaurantAdapter class.
+ * Tests the adapter's functionality for displaying restaurant cards in a RecyclerView.
+ * Uses Robolectric for Android framework simulation and Mockito for mocking dependencies.
+ *
+ * <p>The test suite covers:</p>
+ * <ul>
+ *   <li>Adapter initialization and construction</li>
+ *   <li>View creation and binding</li>
+ *   <li>Item management (counting, removal)</li>
+ *   <li>Click handling and navigation</li>
+ *   <li>ViewHolder initialization</li>
+ *   <li>Error cases and edge conditions</li>
+ * </ul>
+ */
 @RunWith(RobolectricTestRunner.class)
 public class RestaurantAdapterTest {
 
+    /** Mock ViewGroup for testing view creation */
     @Mock
     private ViewGroup mockParent;
+
+    /** Mock LayoutInflater for testing view inflation */
     @Mock
     private LayoutInflater mockInflater;
+
+    /** Mock View for testing item views */
     @Mock
     private View mockItemView;
+
+    /** Mock TextView for testing text displays */
     @Mock
     private TextView mockTextView;
+
+    /** Mock GameActivity for testing context-dependent behavior */
     @Mock
     private GameActivity mockGameActivity;
 
+    /** Argument captor for testing click listeners */
     @Captor
     private ArgumentCaptor<View.OnClickListener> clickListenerCaptor;
 
+    /** The adapter instance being tested */
     private RestaurantAdapter adapter;
+
+    /** Test data for the adapter */
     private List<RestaurantCard> restaurants;
 
+    /**
+     * Sets up the test environment before each test.
+     * Initializes mocks, creates test data, and configures mock behaviors.
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Set up basic restaurant list
         restaurants = new ArrayList<>();
         restaurants.add(new RestaurantCard(
                 "Test Restaurant",
@@ -65,41 +111,60 @@ public class RestaurantAdapterTest {
 
         adapter = new RestaurantAdapter(restaurants);
 
-        // Mock layout inflation
         when(mockParent.getContext()).thenReturn(mockGameActivity);
         when(mockInflater.inflate(eq(R.layout.restaurant_card), any(ViewGroup.class), eq(false)))
                 .thenReturn(mockItemView);
         when(mockItemView.findViewById(anyInt())).thenReturn(mockTextView);
     }
 
+    /**
+     * Tests adapter construction with a valid restaurant list.
+     * Verifies proper initialization and item count.
+     */
     @Test
     public void testConstructorWithValidList() {
         assertNotNull("Adapter should be created with valid list", adapter);
         assertEquals("Item count should match list size", 1, adapter.getItemCount());
     }
 
+    /**
+     * Tests adapter construction with an empty list.
+     * Verifies proper handling of empty lists.
+     */
     @Test
     public void testConstructorWithEmptyList() {
         adapter = new RestaurantAdapter(new ArrayList<>());
         assertEquals("Empty list should have 0 items", 0, adapter.getItemCount());
     }
 
+    /**
+     * Tests adapter construction with null list.
+     * Verifies appropriate exception is thrown.
+     *
+     * @throws NullPointerException when null list is provided
+     */
     @Test(expected = NullPointerException.class)
     public void testConstructorWithNullList() {
         adapter = new RestaurantAdapter(null);
     }
 
+    /**
+     * Tests the getItemCount method with various list states.
+     * Verifies correct count reporting for multiple items and empty list.
+     */
     @Test
     public void testGetItemCount() {
-        // Test with multiple items
         restaurants.add(new RestaurantCard("R2", "C2", "4.0", "Address", "Lunch"));
         assertEquals("Item count should match list size", 2, adapter.getItemCount());
 
-        // Test after clearing
         restaurants.clear();
         assertEquals("Empty list should have 0 items", 0, adapter.getItemCount());
     }
 
+    /**
+     * Tests binding of restaurant data to ViewHolder.
+     * Verifies correct text setting for all fields.
+     */
     @Test
     public void testOnBindViewHolder() {
         RestaurantAdapter.RestaurantViewHolder holder = mock(RestaurantAdapter.RestaurantViewHolder.class);
@@ -118,6 +183,10 @@ public class RestaurantAdapterTest {
         verify(holder.suggestedFor).setText("Suggested for: Dinner");
     }
 
+    /**
+     * Tests binding with empty restaurant data.
+     * Verifies proper handling of empty fields.
+     */
     @Test
     public void testOnBindViewHolderWithEmptyFields() {
         RestaurantCard emptyCard = new RestaurantCard("", "", "", "", "");
@@ -140,9 +209,12 @@ public class RestaurantAdapterTest {
         verify(holder.suggestedFor).setText("Suggested for: ");
     }
 
+    /**
+     * Tests removal of restaurant items.
+     * Verifies correct list modification and size updates.
+     */
     @Test
     public void testRemoveItem() {
-        // Add multiple items
         restaurants.add(new RestaurantCard("R2", "C2", "4.0", "Address", "Lunch"));
         restaurants.add(new RestaurantCard("R3", "C3", "3.5", "Address", "Breakfast"));
 
@@ -154,48 +226,56 @@ public class RestaurantAdapterTest {
                 restaurants.get(1).getName());
     }
 
+    /**
+     * Tests removal of item with invalid index.
+     * Verifies appropriate exception is thrown.
+     *
+     * @throws IndexOutOfBoundsException when invalid index is provided
+     */
     @Test(expected = IndexOutOfBoundsException.class)
     public void testRemoveItemWithInvalidIndex() {
-        adapter.removeItem(5); // Invalid index
+        adapter.removeItem(5);
     }
 
+    /**
+     * Tests click listener functionality.
+     * Verifies proper navigation to maps when restaurant is clicked.
+     */
     @Test
     public void testClickListener() {
-        // Set up mock view and context
         View mockView = mock(View.class);
         when(mockView.getContext()).thenReturn(mockGameActivity);
 
-        // Create adapter and capture click listener
         adapter.onCreateViewHolder(mockParent, 0);
         verify(mockItemView).setOnClickListener(clickListenerCaptor.capture());
 
-        // Get the captured click listener and simulate click
-        View.OnClickListener clickListener = clickListenerCaptor.getValue();
-        clickListener.onClick(mockView);
+        clickListenerCaptor.getValue().onClick(mockView);
 
-        // Verify openInMaps was called
         verify(mockGameActivity).openInMaps(any(RestaurantCard.class));
     }
 
+    /**
+     * Tests click listener behavior with non-GameActivity context.
+     * Verifies that maps navigation is not triggered for invalid context.
+     */
     @Test
     public void testClickListenerWithNonGameActivity() {
-        // Test with a different context type
         Context mockContext = mock(Context.class);
         View mockView = mock(View.class);
         when(mockView.getContext()).thenReturn(mockContext);
 
-        // Create adapter and capture click listener
         adapter.onCreateViewHolder(mockParent, 0);
         verify(mockItemView).setOnClickListener(clickListenerCaptor.capture());
 
-        // Get the captured click listener and simulate click
-        View.OnClickListener clickListener = clickListenerCaptor.getValue();
-        clickListener.onClick(mockView);
+        clickListenerCaptor.getValue().onClick(mockView);
 
-        // Verify openInMaps was never called since it's not a GameActivity
         verify(mockGameActivity, never()).openInMaps(any(RestaurantCard.class));
     }
 
+    /**
+     * Tests ViewHolder initialization.
+     * Verifies all required views are properly initialized.
+     */
     @Test
     public void testViewHolderInitialization() {
         View mockItemView = mock(View.class);
@@ -210,9 +290,12 @@ public class RestaurantAdapterTest {
         assertNotNull("Suggested for TextView should be initialized", holder.suggestedFor);
     }
 
+    /**
+     * Tests ViewHolder creation.
+     * Verifies proper inflation and initialization of ViewHolder.
+     */
     @Test
     public void testOnCreateViewHolder() {
-        // Set up the mock inflater in the context
         when(mockParent.getContext()).thenReturn(mockGameActivity);
         LayoutInflater mockInflater = mock(LayoutInflater.class);
         when(LayoutInflater.from(mockGameActivity)).thenReturn(mockInflater);
