@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapView mapView;
     private LocationManager locationManager;
     private Button useCurrentLocationBtn;
-
     /**
      * Initializes the activity, sets up the UI components, and initializes required services.
      * This includes initializing the Places SDK, location services, map view, and places autocomplete.
@@ -67,15 +66,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Places SDK
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         }
 
-        // Initialize location services
         locationManager = new LocationManager(new GoogleLocationService(this));
 
-        // Initialize Map and UI components
         initializeViews(savedInstanceState);
         setupPlacesAutocomplete();
     }

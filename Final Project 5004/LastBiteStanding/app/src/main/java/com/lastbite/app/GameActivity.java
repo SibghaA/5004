@@ -70,13 +70,11 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Get data from intent
         latitude = getIntent().getDoubleExtra("latitude", 0);
         longitude = getIntent().getDoubleExtra("longitude", 0);
         players = getIntent().getParcelableArrayListExtra("players");
         vetosRemaining = players.size();
 
-        // Initialize Places
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         }
@@ -173,7 +171,6 @@ public class GameActivity extends AppCompatActivity {
             RestaurantCard finalChoice = restaurants.get(0);
             currentPlayerText.setText("Final Selection: " + finalChoice.getName());
 
-            // Create and show the replay button
             Button replayButton = new Button(this);
             replayButton.setText("Play Again");
             replayButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.dark_green)));
@@ -186,7 +183,6 @@ public class GameActivity extends AppCompatActivity {
             params.setMargins(32, 32, 32, 32);
             replayButton.setLayoutParams(params);
 
-            // Find the parent layout and add the button
             LinearLayout parentLayout = findViewById(R.id.gameLayout);
             parentLayout.addView(replayButton);
 
@@ -220,10 +216,8 @@ public class GameActivity extends AppCompatActivity {
                 new LatLng(latitude + radiusInDegrees, longitude + radiusInDegrees)
         );
 
-        // Keep track of restaurants fetched
         final AtomicInteger restaurantsFetched = new AtomicInteger(0);
 
-        // First, fetch restaurants for player preferences
         for (PlayerPreference player : players) {
             findRestaurantForCuisine(player.cuisine, player.name, searchBounds, new RestaurantFetchCallback() {
                 /**
