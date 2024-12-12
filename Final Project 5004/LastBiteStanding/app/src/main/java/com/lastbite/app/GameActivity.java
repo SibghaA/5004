@@ -209,8 +209,7 @@ public class GameActivity extends AppCompatActivity {
      * an additional high-rated restaurant as a bonus option.
      */
     private void fetchRestaurants() {
-        // Create bounds for nearby search
-        double radiusInDegrees = 0.02; // Roughly 2km
+        double radiusInDegrees = 0.02; // Aproxx 2km
         final RectangularBounds searchBounds = RectangularBounds.newInstance(
                 new LatLng(latitude - radiusInDegrees, longitude - radiusInDegrees),
                 new LatLng(latitude + radiusInDegrees, longitude + radiusInDegrees)
